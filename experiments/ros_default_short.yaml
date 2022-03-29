@@ -1,0 +1,5 @@
+experiment_parameters:
+  ros__parameters:
+    experiment_name: "ros_default_short"
+    schedule_type: "default"
+    count_max: 20

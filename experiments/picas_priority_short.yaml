@@ -1,0 +1,5 @@
+experiment_parameters:
+  ros__parameters:
+    experiment_name: "picas_priority_short"
+    schedule_type: "chain_priority"
+    count_max: 20
