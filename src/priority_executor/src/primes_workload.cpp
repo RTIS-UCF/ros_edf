@@ -1,4 +1,5 @@
 #include "priority_executor/primes_workload.hpp"
+#include <iostream>
 ktimeunit nth_prime_silly(int n, double millis)
 {
   // struct tms this_thread_times;
@@ -22,6 +23,10 @@ ktimeunit nth_prime_silly(int n, double millis)
     for (j = 2; j < i; j++)
     {
       sum += j;
+    }
+    if (cum_time - start_cpu_time > millis)
+    {
+      std::cout << "Warning: Time limit exceeded" << std::endl;
     }
   }
   return get_thread_time(&currTime) - start_cpu_time;

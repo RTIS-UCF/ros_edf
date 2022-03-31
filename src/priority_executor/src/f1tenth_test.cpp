@@ -266,7 +266,8 @@ int main(int argc, char **argv)
   rclcpp::shutdown();
 
   std::ofstream output_file;
-  std::string suffix = "_rtis_alloc";
+  // useful if testing different variations
+  std::string suffix = "";
   if (schedule_type == DEADLINE)
   {
     output_file.open("experiments/results/f1tenth_full" + std::to_string(NUM_EXECUTORS) + "c" + suffix + ".txt");
