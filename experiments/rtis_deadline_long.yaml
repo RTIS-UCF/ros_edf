@@ -2,4 +2,4 @@ experiment_parameters:
   ros__parameters:
     experiment_name: "rtis_deadline_long"
     schedule_type: "deadline"
-    count_max: 500
+    count_max: 5000

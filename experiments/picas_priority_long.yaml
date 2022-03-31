@@ -2,4 +2,4 @@ experiment_parameters:
   ros__parameters:
     experiment_name: "picas_priority_long"
     schedule_type: "chain_priority"
-    count_max: 500
+    count_max: 5000
