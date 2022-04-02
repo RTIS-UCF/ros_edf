@@ -57,6 +57,7 @@ void ROSDefaultExecutor::spin()
           PriorityExecutable next_exec = priority_map[any_executable.timer->get_timer_handle()];
 
           auto timer = next_exec.timer_handle;
+          // TODO: this is really a fire
           log_entry(logger, "timer_" + std::to_string(next_exec.chain_id) + "_release_" + std::to_string(millis + (timer->time_until_trigger().count() / 1000000)));
         }
       }

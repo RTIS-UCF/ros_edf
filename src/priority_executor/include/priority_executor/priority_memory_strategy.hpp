@@ -680,6 +680,7 @@ public:
                 log_entry(logger, "timer_" + std::to_string(next_exec->chain_id) + "_release_" + std::to_string(millis + time_until_next_call));
                 if (next_exec->chain_id == 0 && is_f1tenth)
                 {
+                    // special case for logging the shared timer
                     log_entry(logger, "timer_" + std::to_string(next_exec->chain_id + 1) + "_release_" + std::to_string(millis + time_until_next_call));
                 }
             }
@@ -999,7 +1000,7 @@ public:
         priority_map[handle].chain_id = chain_index;
     }
 
-    void set_executable_deadline(std::shared_ptr<const void> handle, int period, ExecutableType t, int chain_id)
+    void set_executable_deadline(std::shared_ptr<const void> handle, int period, ExecutableType t, int chain_id = 0)
     {
         // TODO: any sanity checks should go here
         // priority_map.insert(executable, priority);

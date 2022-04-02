@@ -109,7 +109,23 @@ ament_target_dependencies(f1tenth_publisher
   simple_timer 
 )
 
-install(TARGETS f1tenth_publisher priority_executor
+add_executable(usage_example src/usage_example.cpp)
+target_include_directories(usage_example PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_link_libraries(usage_example
+  priority_executor
+  test_nodes
+  default_executor
+)
+ament_target_dependencies(usage_example
+  rclcpp
+  std_msgs
+  std_srvs
+  simple_timer 
+)
+
+install(TARGETS f1tenth_publisher priority_executor usage_example
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
