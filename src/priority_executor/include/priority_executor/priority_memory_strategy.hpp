@@ -31,8 +31,6 @@
 
 #include "rmw/types.h"
 
-#include "simple_timer/rt-sched.hpp"
-
 /// Delegate for handling memory allocations while the Executor is executing.
 /**
  * By default, the memory strategy dynamically allocates memory for structures that come in from
@@ -218,9 +216,6 @@ class PriorityMemoryStrategy : public rclcpp::memory_strategy::MemoryStrategy
 {
 public:
     RCLCPP_SMART_PTR_DEFINITIONS(PriorityMemoryStrategy<Alloc>)
-
-    node_time_logger logger;
-    bool is_f1tenth = false;
 
     using VoidAllocTraits = typename rclcpp::allocator::AllocRebind<void *, Alloc>;
     using VoidAlloc = typename VoidAllocTraits::allocator_type;
@@ -677,12 +672,6 @@ public:
                 auto timer = next_exec->timer_handle;
                 int64_t time_until_next_call = timer->time_until_trigger().count() / 1000000;
                 // std::cout << "end of chain. time until trigger: " << std::to_string(time_until_next_call) << std::endl;
-                log_entry(logger, "timer_" + std::to_string(next_exec->chain_id) + "_release_" + std::to_string(millis + time_until_next_call));
-                if (next_exec->chain_id == 0 && is_f1tenth)
-                {
-                    // special case for logging the shared timer
-                    log_entry(logger, "timer_" + std::to_string(next_exec->chain_id + 1) + "_release_" + std::to_string(millis + time_until_next_call));
-                }
             }
             if (next_exec->is_first_in_chain && next_exec->sched_type == DEADLINE)
             {
@@ -700,15 +689,13 @@ public:
                 }
                 int64_t time_until_next_call = timer->time_until_trigger().count() / 1000000;
                 // std::cout << "end of chain. time until trigger: " << std::to_string(time_until_next_call) << std::endl;
-                log_entry(logger, "timer_" + std::to_string(next_exec->chain_id) + "_release_" + std::to_string(millis + time_until_next_call));
                 uint64_t next_deadline = millis + time_until_next_call + next_exec->period;
                 next_exec->deadlines->push_back(next_deadline);
-                log_entry(logger, "deadline_" + std::to_string(next_exec->chain_id) + "_" + std::to_string(next_deadline));
                 // std::cout << "deadline set" << std::endl;
             }
             if (next_exec->is_last_in_chain && next_exec->sched_type == DEADLINE)
             {
-                if (!next_exec->deadlines->empty() && (!is_f1tenth || next_exec->chain_id != 0))
+                if (!next_exec->deadlines->empty() && next_exec->chain_id != 0)
                     next_exec->deadlines->pop_front();
             }
             if (next_exec->sched_type == CHAIN_AWARE_PRIORITY || next_exec->sched_type == DEADLINE)

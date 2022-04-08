@@ -1,7 +1,0 @@
-experiment_parameters:
-  ros__parameters:
-    experiment_name: "rtis_deadline_short"
-    schedule_type: "deadline"
-    count_max: 500
-    chain_deadlines: [1000, 1000]
-    chain_periods: [1000, 1000]

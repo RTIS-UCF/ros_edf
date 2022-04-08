@@ -32,81 +32,6 @@ ament_target_dependencies(priority_executor
   rmw
   rclcpp
   rcl
-  simple_timer 
-)
-
-add_library(test_nodes src/test_nodes.cpp)
-target_include_directories(test_nodes PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(test_nodes
-  rmw
-  rclcpp
-  rcl
-  simple_timer
-  std_msgs
-)
-target_link_libraries(test_nodes
-  primes_workload
-)
-
-add_library(primes_workload src/primes_workload.cpp)
-target_include_directories(primes_workload PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(primes_workload
-  simple_timer
-)
-
-
-add_executable(test_publisher src/test_publisher.cpp)
-target_include_directories(test_publisher PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_link_libraries(test_publisher
-  priority_executor
-  test_nodes
-  default_executor
-)
-ament_target_dependencies(
-  test_publisher
-  rclcpp
-  std_msgs
-  std_srvs
-  simple_timer 
-)
-
-install(TARGETS test_publisher priority_executor
-  DESTINATION lib/${PROJECT_NAME})
-
-add_library(default_executor src/default_executor.cpp)
-target_include_directories(default_executor PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(default_executor
-  rclcpp
-  simple_timer
-)
-target_link_libraries(default_executor
-  primes_workload
-)
-
-add_executable(f1tenth_publisher src/f1tenth_test.cpp)
-target_include_directories(test_publisher PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_link_libraries(f1tenth_publisher
-  priority_executor
-  test_nodes
-  default_executor
-)
-ament_target_dependencies(f1tenth_publisher
-  rclcpp
-  std_msgs
-  std_srvs
-  simple_timer 
 )
 
 add_executable(usage_example src/usage_example.cpp)
@@ -115,17 +40,14 @@ target_include_directories(usage_example PUBLIC
   $<INSTALL_INTERFACE:include>)
 target_link_libraries(usage_example
   priority_executor
-  test_nodes
-  default_executor
 )
 ament_target_dependencies(usage_example
   rclcpp
   std_msgs
   std_srvs
-  simple_timer 
 )
 
-install(TARGETS f1tenth_publisher priority_executor usage_example
+install(TARGETS priority_executor usage_example
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)

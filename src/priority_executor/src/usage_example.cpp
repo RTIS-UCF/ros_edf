@@ -1,12 +1,10 @@
 #include "rclcpp/rclcpp.hpp"
 #include "priority_executor/priority_executor.hpp"
 #include "priority_executor/priority_memory_strategy.hpp"
-#include "priority_executor/test_nodes.hpp"
 #include <string>
 #include <fstream>
-#include "simple_timer/rt-sched.hpp"
-#include "priority_executor/default_executor.hpp"
 #include <unistd.h>
+#include "std_msgs/msg/string.hpp"
 
 // re-create the classic talker-listener example with two listeners
 class Talker : public rclcpp::Node
