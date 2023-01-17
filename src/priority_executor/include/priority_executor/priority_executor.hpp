@@ -30,6 +30,7 @@
 #include "rclcpp/utilities.hpp"
 #include "rclcpp/rate.hpp"
 #include "rclcpp/visibility_control.hpp"
+#include "priority_executor/priority_memory_strategy.hpp"
 namespace timed_executor
 {
 
@@ -66,6 +67,7 @@ namespace timed_executor
     std::string name;
 
     void set_use_priorities(bool use_prio);
+    std::shared_ptr<PriorityMemoryStrategy<>> prio_memory_strategy_ = nullptr;
 
   private:
     RCLCPP_DISABLE_COPY(TimedExecutor)

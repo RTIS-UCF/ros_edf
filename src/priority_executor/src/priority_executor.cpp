@@ -57,6 +57,11 @@ namespace timed_executor
         {
           execute_any_executable(any_executable);
         }
+        // make sure memory_strategy_ is an instance of PriorityMemoryStrategy
+        if (prio_memory_strategy_!=nullptr)
+        {
+          prio_memory_strategy_->post_execute(any_executable);
+        }
       }
     }
     std::cout << "shutdown" << std::endl;
@@ -166,7 +171,7 @@ namespace timed_executor
     bool success = false;
     // Check to see if there are any subscriptions or timers needing service
     // TODO(wjwwood): improve run to run efficiency of this function
-    // sched_yield();
+    sched_yield();
     wait_for_work(std::chrono::milliseconds(1));
     success = get_next_ready_executable(any_executable);
     return success;

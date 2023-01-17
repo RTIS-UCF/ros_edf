@@ -23,15 +23,19 @@ find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(simple_timer REQUIRED)
 
-add_library(priority_executor src/priority_executor.cpp)
+add_library(priority_executor  src/priority_executor.cpp src/priority_memory_strategy.cpp)
 target_include_directories(priority_executor PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+# target_link_libraries(priority_executor
+#  simple_timer
+# )
 ament_target_dependencies(priority_executor
   rmw
   rclcpp
   rcl
+  simple_timer
 )
 
 add_executable(usage_example src/usage_example.cpp)
@@ -47,9 +51,21 @@ ament_target_dependencies(usage_example
   std_srvs
 )
 
-install(TARGETS priority_executor usage_example
-  DESTINATION lib/${PROJECT_NAME})
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
 
+install(TARGETS usage_example
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS priority_executor
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+  
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
@@ -61,4 +77,6 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+ament_export_include_directories(include)
+ament_export_libraries(priority_executor)
 ament_package()
