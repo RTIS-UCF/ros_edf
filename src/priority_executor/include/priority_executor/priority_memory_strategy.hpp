@@ -72,7 +72,7 @@ public:
     bool is_first_in_chain = false;
     bool is_last_in_chain = false;
     // chain aware deadlines
-    std::deque<uint> *deadlines = nullptr;
+    std::deque<uint64_t> *deadlines = nullptr;
     std::shared_ptr<rclcpp::TimerBase> timer_handle;
     // just used for logging
     int chain_id = 0;
@@ -293,7 +293,7 @@ public:
         settings->is_last_in_chain = true;
     }
 
-    void assign_deadlines_queue(std::shared_ptr<const void> exec_handle, std::deque<uint> *deadlines)
+    void assign_deadlines_queue(std::shared_ptr<const void> exec_handle, std::deque<uint64_t> *deadlines)
     {
         PriorityExecutable *settings = get_priority_settings(exec_handle);
         settings->deadlines = deadlines;

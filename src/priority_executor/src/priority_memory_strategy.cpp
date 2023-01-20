@@ -99,8 +99,8 @@ bool PriorityExecutableComparator::operator()(const PriorityExecutable *p1, cons
     {
         // TODO: use the counter logic here as well
 
-        uint p1_deadline = 0;
-        uint p2_deadline = 0;
+        uint64_t p1_deadline = 0;
+        uint64_t p2_deadline = 0;
         if (p1->deadlines != nullptr && !p1->deadlines->empty())
         {
             p1_deadline = p1->deadlines->front();
@@ -615,6 +615,7 @@ void PriorityMemoryStrategy<>::post_execute(rclcpp::AnyExecutable any_exec)
     // std::cout<< "running callback. first? " << next_exec->is_first_in_chain << " type " << next_exec->sched_type << std::endl;
     if (next_exec->is_first_in_chain && next_exec->sched_type != DEADLINE)
     {
+        /*
         timespec current_time;
         clock_gettime(CLOCK_MONOTONIC_RAW, &current_time);
         uint64_t millis = (current_time.tv_sec * (uint64_t)1000) + (current_time.tv_nsec / 1000000);
@@ -622,13 +623,14 @@ void PriorityMemoryStrategy<>::post_execute(rclcpp::AnyExecutable any_exec)
         auto timer = next_exec->timer_handle;
         int64_t time_until_next_call = timer->time_until_trigger().count() / 1000000;
         // std::cout << "end of chain. time until trigger: " << std::to_string(time_until_next_call) << std::endl;
+        */
     }
     if (next_exec->is_last_in_chain && next_exec->sched_type == DEADLINE)
     {
         // did we make the deadline?
         timespec current_time;
         clock_gettime(CLOCK_MONOTONIC_RAW, &current_time);
-        uint64_t millis = (current_time.tv_sec * (uint64_t)1000) + (current_time.tv_nsec / 1000000);
+        uint64_t millis = (current_time.tv_sec * 1000UL) + (current_time.tv_nsec / 1000000);
         uint64_t this_deadline = next_exec->deadlines->front();
         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "last, chain id: %d", next_exec->chain_id);
         // for (auto deadline : *next_exec->deadlines)
@@ -653,25 +655,30 @@ void PriorityMemoryStrategy<>::post_execute(rclcpp::AnyExecutable any_exec)
         // uint64_t millis = (current_time.tv_sec * (uint64_t)1000) + (current_time.tv_nsec / 1000000);
         // uint64_t this_deadline = next_exec->deadlines->front();
         uint64_t next_deadline = 0;
-        // if (millis < this_deadline)
-        // {
-        //     next_deadline = this_deadline + next_exec->period;
-        // }
-        // else
+        bool on_time;
+        // time_diff may be negative, to use a signed type to prevent overflow
+        int64_t time_diff = millis - this_deadline;
+        int periods_late;
+        // if time_diff is negative, we completed on time. add one period to the deadline
+        if (time_diff < 0)
         {
-            int periods_late = std::ceil((millis - this_deadline) / (double)next_exec->period);
-            if (periods_late < 1)
-            {
-                periods_late = 1;
-            }
-            next_deadline = this_deadline + (periods_late) * next_exec->period;
+            periods_late = 0;
+            next_deadline = this_deadline + next_exec->period;
+            on_time = true;
+        }
+        // if time_diff is positive, we completed late. add one period for each period we were late
+        else
+        {
+            periods_late = std::ceil(time_diff / (double)next_exec->period);
+            next_deadline = this_deadline + (periods_late + 1) * next_exec->period;
+            on_time = false;
         }
         // std::chrono::nanoseconds time_until = next_exec->timer_handle->time_until_trigger();
         // next_deadline = millis + (time_until.count() / 1000000) + next_exec->period;
         // the next deadline is the current time plus the period, skipping periods that have already passed
 
         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "next deadline: %d", next_deadline);
-        oss << "{\"operation\": \"next_deadline\", \"chain_id\": " << next_exec->chain_id << ", \"deadline\": " << next_deadline << "}";
+        oss << "{\"operation\": \"next_deadline\", \"chain_id\": " << next_exec->chain_id << ", \"deadline\": " << next_deadline << ", \"on_time\": " << on_time << ", \"time_diff\": " << time_diff << ", \"periods_late\": " << periods_late << "}";
         // oss << "{\"operation\": \"next_deadline\", \"chain_id\": " << next_exec->chain_id << ", \"deadline\": " << next_exec->deadlines->front() << "}";
         log_entry(logger_, oss.str());
         next_exec->deadlines->push_back(next_deadline);
