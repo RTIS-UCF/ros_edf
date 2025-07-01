@@ -1,0 +1,19 @@
+{
+  "build":{
+    # "symlink-install": true,
+    "cmake-args": [
+      "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+      "-DCMAKE_EXPORT_COMPILE_COMMANDS=True",
+      "-GNinja",
+      # clang
+      "-DCMAKE_C_COMPILER=clang-18",
+      "-DCMAKE_CXX_COMPILER=clang++-18",
+      # use dwarf 4 for valgrind compatibility
+      # use fsigned-char for consistency with ARM and x86
+      "-DCMAKE_C_FLAGS='-gdwarf-4 -fsigned-char'",
+      "-DCMAKE_CXX_FLAGS=-gdwarf-4 -fsigned-char",
+    ],
+    "event-handlers": ["console_cohesion+"],
+    # "mixin": "clang",
+  }
+}
